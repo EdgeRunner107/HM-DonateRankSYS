@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>후원 집계 관리자</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  background: #00ff00;
+  color: white;
+}
+
+h1 {
+  margin: 0 0 18px 0;
+  font-size: 28px;
+  color: white;
+}
+
+h2 {
+  margin: 0 0 14px 0;
+  font-size: 20px;
+  color: white;
+}
+
+h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: white;
+}
+
+.app {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.section {
+  width: 50%;
+  background: #00ff00;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: none;
+  min-height: 760px;
+}
+
+.top-info {
+  margin-bottom: 14px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.rank-wrap {
+  display: inline-block;
+}
+
+.rank-title {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  padding: 8px 10px;
+  line-height: 1.2;
+}
+
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: fit-content;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rank-item {
+  display: grid;
+  grid-template-columns: 220px 110px;
+  align-items: center;
+  column-gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.rank-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  color: #ffffff;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rank-name-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rank-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rank-num {
+  display: none;
+}
+
+.donation-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donation-badge-emoji {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.donation-badge-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+  border-radius: 4px;
+}
+
+.donation-badge-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.18);
+}
+
+.panel-block {
+  background: #00ff00;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.input-group {
+  flex: 1;
+  min-width: 140px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+input,
+select {
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #475569;
+  background: rgba(0,0,0,0.75);
+  color: white;
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #ffffff;
+}
+
+button {
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  padding: 0 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+  transition: 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: #2563eb;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-green {
+  background: #16a34a;
+}
+
+.btn-green:hover {
+  background: #15803d;
+}
+
+.btn-red {
+  background: #dc2626;
+}
+
+.btn-red:hover {
+  background: #b91c1c;
+}
+
+.btn-gray {
+  background: #475569;
+}
+
+.btn-gray:hover {
+  background: #334155;
+}
+
+.record-item {
+  background: #00ff00;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.record-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.record-time {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.record-key {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.record-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.empty {
+  text-align: center;
+  color: #ffffff;
+  padding: 30px 10px;
+  background: #00ff00;
+  border: none;
+  border-radius: 12px;
+}
+
+.notice {
+  color: #ffffff;
+  font-size: 13px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.status {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #ffffff;
+  min-height: 18px;
+}
+
+.small {
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.center-title {
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .section {
+    width: 100%;
+    min-height: auto;
+    position: relative;
+  }
+
+  .section:first-child {
+    width: fit-content;
+    min-width: 300px;
+    max-width: 420px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="section">
+    <div class="rank-wrap">
+      <div class="rank-title">통합 후원 순위</div>
+
+      <div class="rank-list" id="ranking">
+        <div class="empty">데이터를 불러오는 중입니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>관리자 패널</h2>
+
+    <div class="panel-block">
+      <h3>날짜 범위 조회</h3>
+      <div class="row">
+        <div class="input-group">
+          <label for="startDateInput">시작 날짜</label>
+          <input id="startDateInput" type="date">
+        </div>
+        <div class="input-group">
+          <label for="endDateInput">종료 날짜</label>
+          <input id="endDateInput" type="date">
+        </div>
+      </div>
+      <div class="notice">
+        시작 날짜부터 종료 날짜까지의 후원 내역을 모두 합산해서 왼쪽 집계와 아래 수정/삭제 목록에 보여줍니다.
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3>후원 추가</h3>
+      <div class="row">
+        <div class="input-group">
+          <label for="addName">닉네임</label>
+          <input id="addName" type="text" placeholder="예: 경석">
+        </div>
+        <div class="input-group">
+          <label for="addAmount">금액</label>
+          <input id="addAmount" type="text" placeholder="예: 10000">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div class="input-group">
+          <label for="addType">종류</label>
+          <select id="addType">
+            <option value="계좌후원">계좌후원</option>
+            <option value="투네후원">투네후원</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="addText">텍스트(선택)</label>
+          <input id="addText" type="text" placeholder="예: 문어플">
+        </div>
+      </div>
+
+      <div class="record-actions">
+        <button class="btn-primary" id="addBtn">후원 추가</button>
+      </div>
+      <div class="status" id="addStatus"></div>
+      <div class="notice">
+        저장 시 거래내용은 <b>닉네임/텍스트</b> 형식으로 들어갑니다. 텍스트를 비우면 <b>닉네임/관리자추가</b>로 저장됩니다.
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3>후원 건별 수정 / 삭제</h3>
+      <div class="small" style="margin-bottom:10px;">선택한 날짜 범위의 후원 내역만 표시됩니다.</div>
+      <div class="record-list" id="recordList">
+        <div class="empty">목록을 불러오는 중입니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  update,
+  remove
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAKlnwNBRXWSCZ9HEg6fR_NY1am5sX_CmE",
+  authDomain: "hmacc-181c5.firebaseapp.com",
+  databaseURL: "https://hmacc-181c5-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hmacc-181c5",
+  storageBucket: "hmacc-181c5.firebasestorage.app",
+  messagingSenderId: "570219000349",
+  appId: "1:570219000349:web:ae090986cbc79be8ed4cf4",
+  measurementId: "G-3S3HMMX2ML"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const MIN_AMOUNT = 10000;
+
+// 계좌후원 아이콘
+const ACCOUNT_ICON = "💰";
+
+// 투네후원 이미지 URL 넣기
+// 예: "https://example.com/toonation.png"
+const TOONATION_ICON_URL = "icon.jpg";
+
+const rankingEl = document.getElementById("ranking");
+const startDateInputEl = document.getElementById("startDateInput");
+const endDateInputEl = document.getElementById("endDateInput");
+
+const addNameEl = document.getElementById("addName");
+const addAmountEl = document.getElementById("addAmount");
+const addTypeEl = document.getElementById("addType");
+const addTextEl = document.getElementById("addText");
+const addBtnEl = document.getElementById("addBtn");
+const addStatusEl = document.getElementById("addStatus");
+const recordListEl = document.getElementById("recordList");
+
+let rawData = {};
+let selectedStartDate = getTodayString();
+let selectedEndDate = getTodayString();
+
+function getTodayString() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function formatMoney(num) {
+  return Number(num || 0).toLocaleString("ko-KR") + "원";
+}
+
+function parseAmount(value) {
+  if (value === null || value === undefined) return 0;
+  const num = Number(String(value).replace(/[^\d.-]/g, ""));
+  return isNaN(num) ? 0 : num;
+}
+
+function getDatePart(dateText) {
+  return String(dateText || "").trim().slice(0, 10);
+}
+
+function extractNickname(content) {
+  const text = String(content || "").trim();
+  if (!text) return "";
+  if (text.includes("/")) return text.split("/")[0].trim();
+  return text;
+}
+
+function extractSuffix(content) {
+  const text = String(content || "").trim();
+  if (!text) return "관리자추가";
+  if (text.includes("/")) return text.split("/").slice(1).join("/").trim() || "관리자추가";
+  return "관리자추가";
+}
+
+function composeContent(name, suffix) {
+  const cleanName = String(name || "").trim();
+  const cleanSuffix = String(suffix || "").trim() || "관리자추가";
+  return `${cleanName}/${cleanSuffix}`;
+}
+
+function extractDonationType(item) {
+  const type = String(item?.["종류"] || "").trim();
+  if (type === "계좌후원") return "계좌후원";
+  if (type === "투네후원") return "투네후원";
+  return "기타후원";
+}
+
+function getDonationTypeBadge(type) {
+  if (type === "계좌후원") {
+    return `<span class="donation-badge donation-badge-emoji">${ACCOUNT_ICON}</span>`;
+  }
+
+  if (type === "투네후원") {
+    if (TOONATION_ICON_URL && TOONATION_ICON_URL.trim()) {
+      return `<img class="donation-badge donation-badge-img" src="${escapeHtml(TOONATION_ICON_URL)}" alt="투네후원">`;
+    }
+    return `<span class="donation-badge donation-badge-text">투네</span>`;
+  }
+
+  return `<span class="donation-badge donation-badge-text">기타</span>`;
+}
+
+function normalizeSelectedRange() {
+  if (!selectedStartDate) {
+    selectedStartDate = getTodayString();
+  }
+
+  if (!selectedEndDate) {
+    selectedEndDate = selectedStartDate;
+  }
+
+  if (selectedStartDate > selectedEndDate) {
+    selectedEndDate = selectedStartDate;
+    if (endDateInputEl) endDateInputEl.value = selectedEndDate;
+  }
+
+  if (startDateInputEl) {
+    startDateInputEl.value = selectedStartDate;
+  }
+
+  if (endDateInputEl) {
+    endDateInputEl.value = selectedEndDate;
+    endDateInputEl.min = selectedStartDate;
+  }
+}
+
+function buildDateInputs() {
+  const dates = [];
+
+  Object.values(rawData).forEach(item => {
+    if (!item || typeof item !== "object") return;
+    const date = getDatePart(item["거래일시"]);
+    if (date) dates.push(date);
+  });
+
+  if (dates.length > 0) {
+    const sorted = [...new Set(dates)].sort();
+    const minDate = sorted[0];
+    const maxDate = sorted[sorted.length - 1];
+
+    if (!selectedStartDate) selectedStartDate = minDate;
+    if (!selectedEndDate) selectedEndDate = maxDate;
+
+    if (startDateInputEl) {
+      startDateInputEl.min = minDate;
+      startDateInputEl.max = maxDate;
+    }
+
+    if (endDateInputEl) {
+      endDateInputEl.min = minDate;
+      endDateInputEl.max = maxDate;
+    }
+  }
+
+  normalizeSelectedRange();
+}
+
+function isDateInRange(date, startDate, endDate) {
+  return date >= startDate && date <= endDate;
+}
+
+function getFilteredRecordsByRange(startDate, endDate) {
+  return Object.entries(rawData)
+    .filter(([_, item]) => {
+      if (!item || typeof item !== "object") return false;
+      const itemDate = getDatePart(item["거래일시"]);
+      if (!itemDate) return false;
+      return isDateInRange(itemDate, startDate, endDate);
+    })
+    .sort((a, b) => {
+      const ad = String(a[1]["거래일시"] || "");
+      const bd = String(b[1]["거래일시"] || "");
+      return bd.localeCompare(ad);
+    });
+}
+
+function renderRanking() {
+  const rows = getFilteredRecordsByRange(selectedStartDate, selectedEndDate);
+  const rankData = {};
+  let totalAmount = 0;
+  let validCount = 0;
+
+  rows.forEach(([_, item]) => {
+    const amount =
+      parseAmount(item["입금액"]) ||
+      parseAmount(item["입금"]) ||
+      parseAmount(item["금액"]);
+
+    if (amount < MIN_AMOUNT) return;
+
+    const nickname = extractNickname(item["거래내용"]);
+    if (!nickname) return;
+
+    const donationType = extractDonationType(item);
+    const key = `${donationType}__${nickname}`;
+
+    if (!rankData[key]) {
+      rankData[key] = {
+        name: nickname,
+        type: donationType,
+        amount: 0
+      };
+    }
+
+    rankData[key].amount += amount;
+    totalAmount += amount;
+    validCount += 1;
+  });
+
+  const sorted = Object.values(rankData).sort((a, b) => b.amount - a.amount);
+  const top10 = sorted.slice(0, 10);
+
+  if (top10.length === 0) {
+    rankingEl.innerHTML = `<div class="empty"> </div>`;
+    return;
+  }
+
+  rankingEl.innerHTML = top10.map((row, index) => `
+    <div class="rank-item">
+      <div class="rank-left">
+        ${getDonationTypeBadge(row.type)}
+        <span class="rank-name-text">${index + 1}등 ${escapeHtml(row.name)}</span>
+      </div>
+      <div class="rank-amount">${formatMoney(row.amount)}</div>
+    </div>
+  `).join("");
+}
+
+function renderRecordList() {
+  const rows = getFilteredRecordsByRange(selectedStartDate, selectedEndDate);
+
+  if (rows.length === 0) {
+    recordListEl.innerHTML = `<div class="empty">선택한 날짜 범위의 후원 내역이 없습니다.</div>`;
+    return;
+  }
+
+  recordListEl.innerHTML = rows.map(([key, item]) => {
+    const dateTime = item["거래일시"] || "";
+    const content = item["거래내용"] || "";
+    const amount =
+      parseAmount(item["입금액"]) ||
+      parseAmount(item["입금"]) ||
+      parseAmount(item["금액"]);
+
+    const nickname = extractNickname(content);
+    const suffix = extractSuffix(content);
+    const donationType = extractDonationType(item);
+
+    return `
+      <div class="record-item">
+        <div class="record-top">
+          <div class="record-time">${escapeHtml(dateTime)}</div>
+          <div class="record-key">KEY: ${escapeHtml(key)}</div>
+        </div>
+
+        <div class="row">
+          <div class="input-group">
+            <label>닉네임</label>
+            <input type="text" id="name-${key}" value="${escapeHtml(nickname)}">
+          </div>
+          <div class="input-group">
+            <label>금액</label>
+            <input type="text" id="amount-${key}" value="${amount}">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <div class="input-group">
+            <label>종류</label>
+            <select id="type-${key}">
+              <option value="계좌후원" ${donationType === "계좌후원" ? "selected" : ""}>계좌후원</option>
+              <option value="투네후원" ${donationType === "투네후원" ? "selected" : ""}>투네후원</option>
+              <option value="기타후원" ${donationType === "기타후원" ? "selected" : ""}>기타후원</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>텍스트</label>
+            <input type="text" id="suffix-${key}" value="${escapeHtml(suffix)}">
+          </div>
+        </div>
+
+        <div class="record-actions">
+          <button class="btn-green" onclick="saveRecord('${key}')">수정 저장</button>
+          <button class="btn-red" onclick="deleteRecord('${key}')">삭제</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function rerenderAll() {
+  normalizeSelectedRange();
+  renderRanking();
+  renderRecordList();
+}
+
+function escapeHtml(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function addDonation() {
+  const nickname = addNameEl.value.trim();
+  const amount = parseAmount(addAmountEl.value);
+  const donationType = addTypeEl.value || "계좌후원";
+  const text = addTextEl.value.trim() || "관리자추가";
+
+  if (!nickname) {
+    addStatusEl.textContent = "닉네임을 입력해줘.";
+    return;
+  }
+
+  if (!amount || amount <= 0) {
+    addStatusEl.textContent = "금액을 올바르게 입력해줘.";
+    return;
+  }
+
+  const now = new Date();
+  const selected = selectedEndDate || selectedStartDate || getTodayString();
+
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  const dateTime = `${selected} ${hh}:${mm}:${ss}`;
+
+  const payload = {
+    "거래일시": dateTime,
+    "거래내용": composeContent(nickname, text),
+    "입금액": amount,
+    "종류": donationType,
+    "done": false
+  };
+
+  try {
+    await push(ref(db, "bank_data"), payload);
+    addStatusEl.textContent = "후원이 추가됐어.";
+    addNameEl.value = "";
+    addAmountEl.value = "";
+    addTextEl.value = "";
+    addTypeEl.value = "계좌후원";
+  } catch (error) {
+    console.error(error);
+    addStatusEl.textContent = "추가 중 오류가 발생했어.";
+  }
+}
+
+window.saveRecord = async function(key) {
+  const nameEl = document.getElementById(`name-${key}`);
+  const amountEl = document.getElementById(`amount-${key}`);
+  const typeEl = document.getElementById(`type-${key}`);
+  const suffixEl = document.getElementById(`suffix-${key}`);
+
+  const nickname = nameEl.value.trim();
+  const amount = parseAmount(amountEl.value);
+  const donationType = typeEl.value || "기타후원";
+  const suffix = suffixEl.value.trim() || "관리자추가";
+
+  if (!nickname) {
+    alert("닉네임을 입력해줘.");
+    return;
+  }
+
+  if (!amount || amount <= 0) {
+    alert("금액을 올바르게 입력해줘.");
+    return;
+  }
+
+  try {
+    await update(ref(db, `bank_data/${key}`), {
+      "거래내용": composeContent(nickname, suffix),
+      "입금액": amount,
+      "종류": donationType
+    });
+    alert("수정 완료");
+  } catch (error) {
+    console.error(error);
+    alert("수정 실패");
+  }
+};
+
+window.deleteRecord = async function(key) {
+  const ok = confirm("이 후원 내역을 삭제할까?");
+  if (!ok) return;
+
+  try {
+    await remove(ref(db, `bank_data/${key}`));
+    alert("삭제 완료");
+  } catch (error) {
+    console.error(error);
+    alert("삭제 실패");
+  }
+};
+
+startDateInputEl.addEventListener("change", () => {
+  selectedStartDate = startDateInputEl.value || getTodayString();
+
+  if (!selectedEndDate || selectedEndDate < selectedStartDate) {
+    selectedEndDate = selectedStartDate;
+    if (endDateInputEl) endDateInputEl.value = selectedEndDate;
+  }
+
+  rerenderAll();
+});
+
+endDateInputEl.addEventListener("change", () => {
+  selectedEndDate = endDateInputEl.value || selectedStartDate || getTodayString();
+  rerenderAll();
+});
+
+addBtnEl.addEventListener("click", addDonation);
+
+onValue(ref(db, "bank_data"), snapshot => {
+  rawData = snapshot.val() || {};
+  buildDateInputs();
+  rerenderAll();
+}, error => {
+  console.error(error);
+  rankingEl.innerHTML = `<div class="empty">데이터를 불러오지 못했습니다.</div>`;
+  recordListEl.innerHTML = `<div class="empty">데이터를 불러오지 못했습니다.</div>`;
+});
+</script>
+
+</body>
+</html>
