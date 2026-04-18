@@ -59,6 +59,7 @@ h3 {
 
 .rank-wrap {
   display: inline-block;
+  min-width: 356px;
 }
 
 .rank-title {
@@ -81,6 +82,8 @@ h3 {
   flex-direction: column;
   gap: 6px;
   width: fit-content;
+  min-width: 356px;
+  min-height: 72px;
   padding: 6px;
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(255,255,255,0.12);
@@ -296,6 +299,16 @@ button:hover {
   border-radius: 12px;
 }
 
+.rank-list .empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 12px 10px;
+  background: transparent;
+  border-radius: 8px;
+}
+
 .notice {
   color: #ffffff;
   font-size: 13px;
@@ -335,6 +348,11 @@ button:hover {
     min-width: 300px;
     max-width: 420px;
   }
+
+  .rank-wrap,
+  .rank-list {
+    min-width: 300px;
+  }
 }
 </style>
 </head>
@@ -343,7 +361,7 @@ button:hover {
 <div class="app">
   <div class="section">
     <div class="rank-wrap">
-      <div class="rank-title">통합 후원 순위</div>
+      <div class="rank-title">후원 순위</div>
 
       <div class="rank-list" id="ranking">
         <div class="empty">데이터를 불러오는 중입니다.</div>
@@ -552,38 +570,10 @@ function normalizeSelectedRange() {
 
   if (endDateInputEl) {
     endDateInputEl.value = selectedEndDate;
-    endDateInputEl.min = selectedStartDate;
   }
 }
 
 function buildDateInputs() {
-  const dates = [];
-
-  Object.values(rawData).forEach(item => {
-    if (!item || typeof item !== "object") return;
-    const date = getDatePart(item["거래일시"]);
-    if (date) dates.push(date);
-  });
-
-  if (dates.length > 0) {
-    const sorted = [...new Set(dates)].sort();
-    const minDate = sorted[0];
-    const maxDate = sorted[sorted.length - 1];
-
-    if (!selectedStartDate) selectedStartDate = minDate;
-    if (!selectedEndDate) selectedEndDate = maxDate;
-
-    if (startDateInputEl) {
-      startDateInputEl.min = minDate;
-      startDateInputEl.max = maxDate;
-    }
-
-    if (endDateInputEl) {
-      endDateInputEl.min = minDate;
-      endDateInputEl.max = maxDate;
-    }
-  }
-
   normalizeSelectedRange();
 }
 
